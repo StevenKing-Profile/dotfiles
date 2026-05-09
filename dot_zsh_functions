@@ -1,0 +1,31 @@
+# chezmoi
+czeaa() {
+  chezmoi edit ~/.aliases && chezmoi apply
+  source ~/.zshrc
+  echo "Aliases updated and sourced."
+}
+
+czeaz() {
+  chezmoi edit ~/.zshrc && chezmoi apply
+  source ~/.zshrc
+  echo ".zshrc updated and sourced."
+}
+
+czeazf() {
+  chezmoi edit ~/.zsh_functions && chezmoi apply
+  source ~/.zshrc
+  echo ".zsh_functions  updated and sourced."
+}
+
+#############
+#-- git -- ##
+#############
+
+# ctrl+g to open 'git status' in floating window
+git_status_widget() {
+  echo ""
+  git status -sb
+  zle redisplay
+}
+zle -N git_status_widget
+bindkey "^G" git_status_widget

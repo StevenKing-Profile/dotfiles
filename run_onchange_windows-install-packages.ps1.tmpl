@@ -1,0 +1,27 @@
+{{ if eq .chezmoi.os "windows" -}}
+# Package list hash: {{ include "run_onchange_windows-install-packages.ps1.tmpl" | sha256sum }}
+
+$ErrorActionPreference = "Stop"
+
+Write-Host "Initializing Windows dependencies..."
+
+# Idempotent Package Installation via Winget
+$packages = @(
+    "eza-community.eza",
+    "junegunn.fzf",
+    "jdx.mise",
+    "Starship.Starship",
+    "wez.wezterm"
+)
+
+foreach ($pkg in $packages) {
+    # Check if installed to mimic brew bundle idempotency
+    $check = winget list --exact --id $pkg
+    if (-not $check) {
+        Write-Host "Installing $pkg..."
+        winget install --exact --id $pkg --accept-package-agreements --accept-source-agreements
+    }
+}
+
+Write-Host "Windows dependencies synced."
+{{ end -}}

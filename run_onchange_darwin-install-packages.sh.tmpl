@@ -1,0 +1,56 @@
+{{ if eq .chezmoi.os "darwin" -}}
+#!/bin/bash
+
+# Package list hash: {{ include "run_onchange_darwin-install-packages.sh.tmpl" | sha256sum }}
+set -eufo pipefail
+
+echo "Initializing macOS dependencies..."
+
+# 1. Bootstrapping Homebrew if missing
+if ! command -v brew &> /dev/null; then
+    echo "Homebrew not found. Installing..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    
+    # Inject brew into the current shell session for the rest of this script
+    if [[ -f "/opt/homebrew/bin/brew" ]]; then
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+    else
+        eval "$(/usr/local/bin/brew shellenv)"
+    fi
+fi
+
+# 2. Idempotent Package Installation via Brewfile syntax
+# Including Nerd Font for iTerm2 glyph support
+# TODO: open iterm Preference >  Profiles > Text > Click "Change Font"
+brew bundle --no-lock --file=/dev/stdin <<EOF
+# Core Utilities
+brew "eza"
+brew "fzf"
+brew "zoxide"
+brew "atuin"
+brew "starship"
+
+# Runtimes & Toolchain
+brew "mise"
+brew "uv"
+
+# Environment
+brew "tmux"
+
+# Fonts (Required for Starship icons in iTerm2)
+tap "homebrew/cask-fonts"
+cask "font-jetbrains-mono-nerd-font"
+EOF
+
+# 3. Runtime Configuration
+echo "Setting default versions via mise..."
+# Ensure mise is in the current PATH if it was just installed
+if command -v mise &> /dev/null; then
+    mise use --global node@lts
+    mise use --global yarn@latest
+else
+    echo "Warning: mise not found in PATH. Skipping global runtime setup."
+fi
+
+echo "macOS dependencies synced."
+{{ end -}}

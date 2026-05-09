@@ -1,0 +1,51 @@
+[user]
+    name = Steven King
+    email = dev@stevenking.net
+
+[core]
+    # Use the Rust-based pager you just installed
+    pager = delta
+    editor = vim
+
+[init]
+    # Modern default branch naming
+    defaultBranch = main
+
+[pull]
+    # Rebase by default to prevent messy merge commits when pulling
+    rebase = true
+
+[push]
+    # Only push the current branch to its corresponding remote branch
+    default = current
+    # Automatically setup remote tracking if it doesn't exist
+    autoSetupRemote = true
+
+[fetch]
+    # Automatically prune remote-tracking branches that were deleted on the server
+    prune = true
+
+[alias]
+    st = status -sb
+    co = checkout
+    br = branch
+    ci = commit
+    # Force push safely: verifies no one else has pushed to the branch before overwriting
+    pf = push --force-with-lease
+    # A clean, one-line graphical log for terminal viewing
+    lg = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)' --all
+
+[interactive]
+    diffFilter = delta --color-only
+
+[delta]
+    navigate = true
+    light = false
+    line-numbers = true
+    side-by-side = true
+
+[merge]
+    conflictstyle = diff3
+
+[diff]
+    colorMoved = default

@@ -1,0 +1,105 @@
+# ==============================================================================
+# SYSTEM INITIALIZATION
+# ==============================================================================
+
+{{ if eq .chezmoi.os "darwin" -}}
+# Initialize Homebrew (Apple Silicon + Intel support)
+if [[ -f "/opt/homebrew/bin/brew" ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -f "/usr/local/bin/brew" ]]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+fi
+{{ end -}}
+
+# Initialize Mise (Universal Version Manager)
+# Must happen after Homebrew to ensure the 'mise' binary is found
+if command -v mise &> /dev/null; then
+    eval "$(mise activate zsh)"
+fi
+
+# ==============================================================================
+# ENVIRONMENT & PATH
+# ==============================================================================
+{{ if eq .chezmoi.os "linux" -}}
+export XCURSOR_THEME="catppuccin-mocha-dark-cursors"
+XCURSOR_SIZE=24
+{{- end }}
+
+export COLORTERM="truecolor"
+export STARSHIP_CONFIG="$HOME/.config/starship.toml"
+
+# Ensure local binaries take precedence over system binaries
+export PATH="$HOME/.local/bin:$PATH"
+
+# Source localized environment variables
+[ -f "$HOME/.local/bin/env" ] && source "$HOME/.local/bin/env"
+[ -f "$HOME/.atuin/bin/env" ] && source "$HOME/.atuin/bin/env"
+
+# ==============================================================================
+# NATIVE ZSH HISTORY
+# ==============================================================================
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=50000
+SAVEHIST=50000
+setopt appendhistory
+setopt incappendhistory
+setopt sharehistory
+
+# ==============================================================================
+# TOOLCHAIN MANAGERS
+# ==============================================================================
+# mise (Replaces NVM, SDKMAN, jEnv)
+{{- if eq .chezmoi.os "darwin" }}
+eval "$(/opt/homebrew/bin/mise activate zsh)"
+{{- else }}
+eval "$({{ .chezmoi.homeDir }}/.local/bin/mise activate zsh)"
+{{- end }}
+
+# uv shell completions
+eval "$(uv generate-shell-completion zsh)"
+
+# ==============================================================================
+# TERMINAL WIZARD INTEGRATIONS
+# ==============================================================================
+# fzf: Fuzzy finder bindings (Ctrl+R, Ctrl+T, Alt+C)
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# zoxide: Smart directory jumping
+eval "$(zoxide init zsh)"
+
+# atuin: SQLite shell history database
+eval "$(atuin init zsh)"
+
+# starship: Asynchronous, framework-free prompt (Replaces Agnoster)
+eval "$(starship init zsh)"
+
+# ==============================================================================
+# KEYBINDINGS: XTERM STANDARDS
+# ==============================================================================
+
+# Use 'bindkey -e' to ensure we are in Emacs mode (Zsh default)
+bindkey -e
+
+# Map Control + Left/Right (xterm standard) to ZLE word widgets
+bindkey "\e[1;5D" backward-word
+bindkey "\e[1;5C" forward-word
+
+# Map Control + Backspace / Control + Delete
+bindkey "\e[3;5~" delete-word
+bindkey '^H' backward-kill-word
+
+# ==============================================================================
+# UI PLUGINS (Manual Sourcing)
+# ==============================================================================
+[ -f ~/.local/share/zsh/zsh-autosuggestions/zsh-autosuggestions.zsh ] && source ~/.local/share/zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+[ -f ~/.local/share/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] && source ~/.local/share/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# ==============================================================================
+# ALIASES
+# ==============================================================================
+[ -f "$HOME/.aliases" ] && source "$HOME/.aliases"
+
+# ==============================================================================
+# CUSTOM FUNCTIONS & WIDGETS
+# ==============================================================================
+[ -f "$HOME/.zsh_functions" ] && source "$HOME/.zsh_functions"

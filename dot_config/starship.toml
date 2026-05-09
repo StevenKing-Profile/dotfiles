@@ -1,0 +1,112 @@
+# Catppuccin Mocha Palette
+palette = "catppuccin_mocha"
+
+# Global format string with no extra spaces or prepositions
+format = """$directory$git_branch$git_status$kubernetes$azure$aws$memory_usage$jobs$python$nodejs$java$cmd_duration$character"""
+
+[directory]
+style = "bold sapphire"
+truncation_length = 3
+format = "[$path]($style) "
+
+[git_branch]
+symbol = " "
+style = "bold mauve"
+format = "[$symbol$branch]($style) "
+
+[git_status]
+style = "bold red"
+untracked = ""
+ahead = "[⇡](bold green)"
+behind = "[⇣](bold red)"
+diverged = "[⇕](bold peach)"
+up_to_date = "[✓](bold lavender)"
+format = "([$all_status$ahead_behind]($style) )"
+
+[kubernetes]
+symbol = "󱏿 "
+style = "bold blue"
+# format: cluster_name (namespace)
+format = '[$symbol($cluster \($namespace\))]($style) '
+disabled = false
+
+[aws]
+disabled = true
+
+[custom.aws_scoped]
+# This pulls the profile name directly from your env
+command = "echo $AWS_PROFILE"
+# Only runs if AWS_PROFILE is actually set
+when = "test -n \"$AWS_PROFILE\""
+symbol = " "
+style = "bold yellow"
+format = "on [$symbol($output)]($style) "
+# NOW you can use these keys
+detect_files = ['.aws', 'terragrunt.hcl', 'config.tf']
+
+[azure]
+disabled = true
+
+[custom.azure_context]
+when = "az account show &>/dev/null"
+
+# Gets the subscription name and applies your 'AS1' alias via sed
+command = "az account show --query name -o tsv | sed 's/Azure subscription 1/AS1/'"
+
+# UI Settings to match your style
+symbol = "󰠅 "
+style = "bold blue"
+format = "on [$symbol($output)]($style) "
+
+[memory_usage]
+symbol = "󰍛 "
+style = "bold maroon"
+threshold = 80
+format = "[$symbol${ram_pct}]($style) "
+disabled = false
+
+[jobs]
+symbol = " "
+style = "bold white"
+number_threshold = 1
+format = "[$symbol]($style)"
+
+[python]
+symbol = "🐍 "
+style = "bold yellow"
+format = '[${symbol}${version}]($style) '
+
+[nodejs]
+symbol = "󰎙 "
+style = "bold green"
+format = '[${symbol}${version}]($style) '
+
+[java]
+symbol = " "
+style = "bold peach"
+format = '[${symbol}${version}]($style) '
+
+[cmd_duration]
+min_time = 20000
+style = "bold maroon"
+format = "[$duration]($style) "
+
+[character]
+success_symbol = "[❯](bold green) "
+error_symbol = "[✘](bold red) "
+
+[palettes.catppuccin_mocha]
+rosewater = "#f5e0dc"
+flamingo = "#f2cdcd"
+pink = "#f5c2e7"
+mauve = "#cba6f7"
+red = "#f38ba8"
+maroon = "#eba0ac"
+peach = "#fab387"
+yellow = "#f9e2af"
+green = "#a6e22e"
+teal = "#94e2d5"
+sky = "#89dceb"
+sapphire = "#74c7ec"
+blue = "#89b4fa"
+lavender = "#b4befe"
