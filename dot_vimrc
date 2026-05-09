@@ -1,20 +1,13 @@
-
 " ==============================================================================
 " OPTIMIZED CLIPBOARD ARCHITECTURE (Latency-First)
 " ==============================================================================
 
-" Optimized OS Detection (Uses internal Vim variables, no shell fork)
-if has('mac')
-    " macOS specific
-    vnoremap <silent> y :w !pbcopy<CR><CR>
-    nnoremap <silent> p :r !pbpaste<CR>
-elseif has('unix') && $WAYLAND_DISPLAY != ""
-    " Wayland specific (Ubuntu)
-    vnoremap <silent> y :w !wl-copy<CR><CR>
-    nnoremap <silent> p :r !wl-paste --no-newline<CR>
-endif
+" 1. Native OS Clipboard Integration
+" This eliminates shell-forking overhead and natively handles yy, y, p, and P 
+" across both Visual and Normal modes without blocking the UI thread.
+set clipboard^=unnamed,unnamedplus
 
-" 3. The OSC 52 'Wizard' Fallback
+" 2. The OSC 52 'Wizard' Fallback (Kept as explicit opt-in to prevent lag)
 function! OSC52Copy(text)
     let l:b64 = system('base64 | tr -d "\n"', a:text)
     let l:esc = "\e]52;c;" . l:b64 . "\x07"
@@ -30,13 +23,14 @@ noremap <silent> <Leader>y y:call OSC52Copy(@0)<CR>
 " ==========================================
 " Moving Text
 " ==========================================
-" Visual Mode: Move block up/down iterativel via  tapping j or k
+" Visual Mode: Move block up/down iteratively via tapping j or k
 vnoremap <A-j> :m '>+1<CR>gv=gv
 vnoremap <A-k> :m '<-2<CR>gv=gv
 
 " Add blank line (k or j)
 nnoremap ]<space> o<esc>k
 nnoremap [<space> O<esc>j
+
 " ==========================================
 " UNIVERSAL TEMPLATE & FILETYPE DETECTION
 " ==========================================

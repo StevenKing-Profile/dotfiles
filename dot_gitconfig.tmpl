@@ -1,6 +1,19 @@
 [user]
-    name = Steven King
-    email = dev@stevenking.net
+    name = Your Name
+    # Example: Inject different emails based on the machine's OS or Hostname
+    {{ if eq .chezmoi.os "darwin" }}
+    email = mac.user@domain.com
+    {{ else }}
+    email = linux.user@domain.com
+    {{ end }}
+
+[credential]
+    # macOS uses the native keychain. Linux uses memory cache (1 hour timeout).
+    {{ if eq .chezmoi.os "darwin" }}
+    helper = osxkeychain
+    {{ else if eq .chezmoi.os "linux" }}
+    helper = cache --timeout=3600
+    {{ end }}
 
 [core]
     # Use the Rust-based pager you just installed
