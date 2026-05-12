@@ -11,6 +11,8 @@ elif [[ -f "/usr/local/bin/brew" ]]; then
 fi
 {{ end }}
 
+export PATH="$HOME/.local/bin:$PATH"
+
 # Initialize Mise (Universal Version Manager)
 # Must happen before other tools to ensure runtimes (Node/Java/etc) are on PATH
 if command -v mise &> /dev/null; then
@@ -27,9 +29,6 @@ export XCURSOR_SIZE=24
 
 export COLORTERM="truecolor"
 export STARSHIP_CONFIG="$HOME/.config/starship.toml"
-
-# Ensure local binaries take precedence over system binaries
-export PATH="$HOME/.local/bin:$PATH"
 
 # Source localized environment variables
 [ -f "$HOME/.local/bin/env" ] && source "$HOME/.local/bin/env"
